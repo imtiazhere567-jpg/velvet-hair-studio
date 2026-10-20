@@ -364,13 +364,50 @@
   .v-chips span { font-size: 13px; font-weight: 500; color: var(--plum); background: rgba(255,255,255,.92); backdrop-filter: blur(8px); padding: 10px 16px; border-radius: 999px; box-shadow: 0 10px 24px -14px rgba(31,12,28,.5); }
 
   /* ---------- FAQ ---------- */
-  .faq .wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; }
-  details { border-bottom: 1px solid var(--line); }
-  summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 20px; font-family: var(--serif); font-size: 30px; color: var(--plum); padding: 28px 0; }
-  summary::-webkit-details-marker { display: none; }
-  summary i { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font-style: normal; font-family: var(--sans); font-size: 22px; color: var(--orange); transition: transform .5s var(--ease), background .3s; }
-  details[open] summary i { transform: rotate(45deg); background: var(--blush); }
-  details p { padding: 0 0 28px; color: #5e4459; max-width: 620px; font-weight: 300; font-size: 17px; }
+  .faq { overflow: hidden; }
+  .faq::before { content: ""; position: absolute; width: 640px; height: 640px; left: -260px; top: 10%; border-radius: 50%; background: radial-gradient(circle, var(--blush-2), transparent 65%); opacity: .55; pointer-events: none; }
+  .faq .wrap { display: grid; grid-template-columns: .82fr 1.18fr; gap: 80px; align-items: start; position: relative; }
+  .faq-side { position: sticky; top: 14vh; }
+  .faq-side .lead { margin: 22px 0 30px; }
+  .faq-filter { position: relative; display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 5px; background: #fff; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 14px 34px -24px rgba(61,20,54,.45); }
+  .faq-filter button { position: relative; z-index: 1; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--plum); transition: color .4s; }
+  .faq-filter button.on { color: #fff; }
+  .faq-filter .pill { position: absolute; left: 5px; top: 5px; width: 0; height: 0; border-radius: 999px; background: var(--plum); transition: left .6s var(--ease), top .6s var(--ease), width .6s var(--ease); }
+  .faq-help { margin-top: 40px; padding: 26px; border-radius: 28px; background: var(--plum); color: #f6dce4; position: relative; overflow: hidden; }
+  .faq-help::before { content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -110px; border-radius: 50%; background: radial-gradient(circle, rgba(242,107,42,.35), transparent 65%); }
+  .faq-help .who { display: flex; align-items: center; gap: 16px; position: relative; }
+  .faq-help .av { position: relative; width: 62px; height: 62px; flex: none; }
+  .faq-help .av img { border-radius: 50%; object-position: 50% 22%; border: 2px solid rgba(255,255,255,.3); }
+  .faq-help .av::after { content: ""; position: absolute; right: 2px; bottom: 2px; width: 13px; height: 13px; border-radius: 50%; background: #2fb36d; border: 2px solid var(--plum); animation: live 1.8s infinite; }
+  .faq-help b { display: block; font-family: var(--serif); font-size: 26px; font-weight: 400; color: #fff; line-height: 1.1; }
+  .faq-help small { font-size: 13px; color: #d6b6c8; }
+  .faq-help .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; position: relative; }
+  .faq-help .tel { display: inline-flex; align-items: center; gap: 10px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); color: #fff; font-size: 14px; font-weight: 500; transition: background .4s, border-color .4s; }
+  .faq-help .tel:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.5); }
+  .faq-help .tel svg { width: 16px; height: 16px; fill: none; stroke: var(--orange-2); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .faq-list { display: flex; flex-direction: column; gap: 14px; }
+  .fq { background: #fff; border: 1px solid var(--line); border-radius: 26px; overflow: hidden; transition: background .6s var(--ease), border-color .6s, box-shadow .6s var(--ease), translate .6s var(--ease); }
+  .fq:not(.open):hover { translate: 0 -4px; box-shadow: 0 26px 50px -30px rgba(61,20,54,.45); border-color: rgba(61,20,54,.22); }
+  .fq.open { background: var(--plum); border-color: var(--plum); box-shadow: 0 36px 70px -34px rgba(61,20,54,.75); }
+  .fq-q { width: 100%; display: grid; grid-template-columns: 52px 1fr 50px; align-items: center; gap: 16px; padding: 24px 26px; text-align: left; }
+  .fq-n { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--orange); transition: transform .6s var(--ease); }
+  .fq:hover .fq-n { transform: translateX(4px); }
+  .fq-c { display: block; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--plum-soft); margin-bottom: 6px; transition: color .5s; }
+  .fq-t { display: block; font-family: var(--serif); font-size: clamp(22px, 2vw, 29px); line-height: 1.2; color: var(--plum); transition: color .5s; }
+  .fq.open .fq-c { color: #ffc7d6; } .fq.open .fq-t { color: #fff; }
+  .fq-i { position: relative; width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--line); transition: background .5s var(--ease), border-color .5s, transform .7s var(--ease); }
+  .fq-i::before, .fq-i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 16px; height: 1.8px; border-radius: 2px; background: var(--orange); transform: translate(-50%, -50%); transition: background .4s; }
+  .fq-i::after { transform: translate(-50%, -50%) rotate(90deg); }
+  .fq:hover .fq-i { border-color: var(--orange); }
+  .fq.open .fq-i { background: var(--orange); border-color: var(--orange); transform: rotate(135deg); }
+  .fq.open .fq-i::before, .fq.open .fq-i::after { background: #fff; }
+  .fq-a { height: 0; overflow: hidden; }
+  .fq-a-in { padding: 0 92px 28px 94px; }
+  .fq-a-in p { color: rgba(255,255,255,.84); font-size: 17px; font-weight: 300; line-height: 1.7; max-width: 560px; }
+  .fq-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--orange-2); }
+  .fq-more i { font-style: normal; transition: transform .5s var(--ease); }
+  .fq-more:hover i { transform: translateX(5px); }
 
   /* ---------- Big CTA + footer ---------- */
   .big-cta { position: relative; height: 100vh; min-height: 640px; overflow: hidden; display: grid; place-items: center; text-align: center; color: #fff; }
@@ -412,13 +449,13 @@
   .lb-count { font-family: var(--serif); font-size: 22px; letter-spacing: .02em; }
   .lb-count span { color: rgba(255,255,255,.5); }
   .lb-count small { font-family: var(--sans); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #ffc7d6; margin-left: 14px; }
-  .lb-btn { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); backdrop-filter: blur(10px); transition: background .4s, transform .6s var(--ease), border-color .4s; }
+  .lb-btn { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); backdrop-filter: blur(10px); transition: background .4s, rotate .6s var(--ease), translate .6s var(--ease), border-color .4s; }
   .lb-btn:hover { background: var(--orange); border-color: var(--orange); }
   .lb-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .lb-close:hover { transform: rotate(90deg); }
+  .lb-close:hover { rotate: 90deg; }
   .lb-prev, .lb-next { top: 50%; margin-top: -27px; }
   .lb-prev { left: 32px; } .lb-next { right: 32px; }
-  .lb-prev:hover { transform: translateX(-4px); } .lb-next:hover { transform: translateX(4px); }
+  .lb-prev:hover { translate: -4px 0; } .lb-next:hover { translate: 4px 0; }
   .lb-bottom { left: 32px; right: 32px; bottom: 28px; display: flex; justify-content: space-between; align-items: end; gap: 24px; }
   .lb-title { overflow: hidden; }
   .lb-title h3 { color: #fff; font-size: clamp(34px, 3.6vw, 54px); line-height: 1; }
@@ -465,6 +502,7 @@
   /* ---------- Responsive ---------- */
   @media (max-width: 1024px) {
     .intro .wrap, .exp .wrap, .prices .wrap, .faq .wrap { grid-template-columns: 1fr; gap: 50px; }
+    .faq-side { position: static; }
     .v-grid { grid-template-columns: 1fr; }
     .exp-media { height: 56vh; top: 10vh; }
     .prices-side { position: static; }
@@ -515,7 +553,9 @@
     .foot-grid { grid-template-columns: 1fr; }
     .sticky-book { display: block; }
     .hover-img { display: none; }
-    summary { font-size: 24px; }
+    .fq-q { grid-template-columns: 34px 1fr 42px; gap: 12px; padding: 20px; } .fq-i { width: 42px; height: 42px; }
+    .fq-a-in { padding: 0 20px 24px 66px; } .fq-a-in p { font-size: 16px; }
+    .faq-filter button { padding: 9px 14px; font-size: 13px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
@@ -757,14 +797,23 @@
 <!-- ================= FAQ ================= -->
 <section class="faq pad" style="padding-top:20px">
   <div class="wrap">
-    <div><span class="eyebrow">Good to know</span><h2 style="margin-top:16px" data-split>Questions, <em>answered</em></h2></div>
-    <div data-reveal>
-      <details><summary>Do I need a patch test before colour?<i>+</i></summary><p>Yes. For new colour clients we do a quick patch test at least 48 hours before your appointment. It's free and takes five minutes.</p></details>
-      <details><summary>Can I change or cancel my booking?<i>+</i></summary><p>Of course. You can move or cancel online up to 24 hours before your appointment at no cost.</p></details>
-      <details><summary>How long does balayage take?<i>+</i></summary><p>Usually two and a half to three hours, including toning and a blow dry. Bring a book, we'll bring the tea.</p></details>
-      <details><summary>Do you offer bridal hair?<i>+</i></summary><p>Yes. We offer trials in the studio and can come to your venue on the day. Book a trial and we'll talk through everything.</p></details>
-      <details><summary>Is there a discount for new clients?<i>+</i></summary><p>New clients get 15% off their first visit when they book online.</p></details>
+    <div class="faq-side">
+      <span class="eyebrow">Good to know</span>
+      <h2 style="margin-top:16px" data-split>Questions, <em>answered</em></h2>
+      <p class="lead" data-reveal>Everything people usually ask before their first visit. Pick a topic to narrow it down.</p>
+      <div class="faq-filter" id="faqFilter" data-reveal><span class="pill" id="faqPill"></span></div>
+      <div class="faq-help" id="faqHelp">
+        <div class="who">
+          <div class="av"><img src="https://images.pexels.com/photos/3993303/pexels-photo-3993303.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=200" alt="Maya, founder"></div>
+          <div><b>Still wondering?</b><small>Maya usually replies within an hour</small></div>
+        </div>
+        <div class="acts">
+          <a class="tel" href="tel:01174960000"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>0117 496 0000</a>
+          <button class="btn-book" data-book>Book now <span class="arr"></span></button>
+        </div>
+      </div>
     </div>
+    <div class="faq-list" id="faqList"></div>
   </div>
 </section>
 
@@ -1047,6 +1096,32 @@ document.getElementById('vhRows').innerHTML = hours.map(([d, o, c], i) => {
   document.getElementById('vStatusPill').classList.toggle('closed', !isOpen);
 })();
 
+/* ---------- FAQ ---------- */
+// [topic, question, answer, optional booking link label]
+const faqs = [
+  ['Colour', 'Do I need a patch test before colour?', "Yes. For new colour clients we do a quick patch test at least 48 hours before your appointment. It's free and takes five minutes.", 'Book a patch test'],
+  ['Booking', 'Can I change or cancel my booking?', 'Of course. You can move or cancel online up to 24 hours before your appointment at no cost.'],
+  ['Colour', 'How long does balayage take?', "Usually two and a half to three hours, including toning and a blow dry. Bring a book, we'll bring the tea.", 'Book balayage'],
+  ['Bridal', 'Do you offer bridal hair?', "Yes. We offer trials in the studio and can come to your venue on the day. Book a trial and we'll talk through everything.", 'Book a bridal trial'],
+  ['Booking', 'Is there a discount for new clients?', "New clients get 15% off their first visit when they book online. It's applied automatically.", 'Claim 15% off'],
+  ['Cuts', 'Do you cut curly and textured hair?', 'Yes. We cut curls dry, curl by curl, so you can see the shape as it takes form.'],
+  ['Colour', 'Should I wash my hair before colour?', 'Come with hair washed a day or two before. A little natural oil protects your scalp during colour.'],
+  ['Bridal', 'How far ahead should I book for a wedding?', 'Ideally six to twelve months ahead for summer Saturdays, and three to six months for the rest of the year.']
+];
+const faqCats = ['All', ...new Set(faqs.map(f => f[0]))];
+document.getElementById('faqFilter').insertAdjacentHTML('beforeend', faqCats.map((c, i) => `<button type="button" class="${i ? '' : 'on'}" data-cat="${c}">${c}</button>`).join(''));
+document.getElementById('faqList').innerHTML = faqs.map((f, i) => `
+  <div class="fq" data-cat="${f[0]}">
+    <button class="fq-q" type="button" aria-expanded="false" aria-controls="fqa${i}" id="fqq${i}">
+      <span class="fq-n">${String(i + 1).padStart(2, '0')}</span>
+      <span><span class="fq-c">${f[0]}</span><span class="fq-t">${f[1]}</span></span>
+      <span class="fq-i" aria-hidden="true"></span>
+    </button>
+    <div class="fq-a" id="fqa${i}" role="region" aria-labelledby="fqq${i}">
+      <div class="fq-a-in"><p>${f[2]}</p>${f[3] ? `<button type="button" class="fq-more" data-book>${f[3]} <i>→</i></button>` : ''}</div>
+    </div>
+  </div>`).join('');
+
 /* ======================================================
    MOTION
    ====================================================== */
@@ -1175,6 +1250,10 @@ function buildScroll() {
 
   /* ---- Parallax images ---- */
   gsap.utils.toArray('[data-parallax] img').forEach(im => gsap.fromTo(im, { yPercent: -8, scale: 1.18 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: im.parentElement, scrub: true } }));
+  /* ---- FAQ entrance ---- */
+  gsap.from('#faqList .fq', { x: 70, opacity: 0, rotation: 1.2, transformOrigin: '0% 50%', duration: 1.1, stagger: .08, ease: 'expo.out', scrollTrigger: { trigger: '#faqList', start: 'top 82%' } });
+  gsap.from('#faqHelp', { y: 60, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '#faqHelp', start: 'top 92%' } });
+
   /* ---- Visit section ---- */
   // clip-path through numbers (see heroClip note)
   const clipTween = (el, from, to, st) => {
@@ -1296,6 +1375,53 @@ document.addEventListener('click', e => {
   }
 });
 addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+/* ---------- FAQ: accordion + topic filter ---------- */
+(function () {
+  const list = document.getElementById('faqList'), items = [...list.querySelectorAll('.fq')];
+  const filter = document.getElementById('faqFilter'), pill = document.getElementById('faqPill');
+  let refreshT;
+  const refresh = () => { if (!hasGsap) return; clearTimeout(refreshT); refreshT = setTimeout(() => ScrollTrigger.refresh(), 150); };
+
+  function setOpen(item, open) {
+    const a = item.querySelector('.fq-a'), q = item.querySelector('.fq-q');
+    item.classList.toggle('open', open); q.setAttribute('aria-expanded', open);
+    if (!hasGsap) { a.style.height = open ? 'auto' : '0'; return; }
+    gsap.killTweensOf(a);
+    if (open) {
+      gsap.to(a, { height: 'auto', duration: .8, ease: 'expo.out', onComplete: refresh });
+      gsap.fromTo(a.querySelectorAll('.fq-a-in > *'), { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .7, stagger: .08, delay: .12, ease: 'expo.out' });
+    } else {
+      gsap.to(a, { height: 0, duration: .55, ease: 'expo.inOut', onComplete: refresh });
+    }
+  }
+  list.addEventListener('click', e => {
+    const q = e.target.closest('.fq-q'); if (!q) return;
+    const item = q.closest('.fq'), willOpen = !item.classList.contains('open');
+    items.forEach(it => it !== item && it.classList.contains('open') && setOpen(it, false));
+    setOpen(item, willOpen);
+  });
+
+  // sliding highlight behind the active topic (follows wrapped rows too)
+  const movePill = btn => { if (!btn) return; Object.assign(pill.style, { left: btn.offsetLeft + 'px', top: btn.offsetTop + 'px', width: btn.offsetWidth + 'px', height: btn.offsetHeight + 'px' }); };
+  const active = () => filter.querySelector('button.on');
+  requestAnimationFrame(() => movePill(active()));
+  addEventListener('resize', () => movePill(active()));
+  if (document.fonts) document.fonts.ready.then(() => movePill(active()));
+
+  filter.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.classList.contains('on')) return;
+    filter.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); movePill(b);
+    const cat = b.dataset.cat, show = items.filter(it => cat === 'All' || it.dataset.cat === cat), hide = items.filter(it => !show.includes(it));
+    hide.forEach(it => it.classList.contains('open') && setOpen(it, false));
+    const renumber = () => show.forEach((it, i) => { it.querySelector('.fq-n').textContent = String(i + 1).padStart(2, '0'); });
+    if (!hasGsap) { hide.forEach(it => it.style.display = 'none'); show.forEach(it => it.style.display = ''); renumber(); return; }
+    gsap.to(items, { opacity: 0, y: -14, duration: .28, stagger: .02, ease: 'power2.in', overwrite: true, onComplete: () => {
+      hide.forEach(it => it.style.display = 'none'); show.forEach(it => it.style.display = ''); renumber();
+      gsap.fromTo(show, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: .8, stagger: .07, ease: 'expo.out', onComplete: refresh });
+    } });
+  });
+})();
 
 /* ---------- Footer "Velvet studio": letters spread on hover and follow the cursor ---------- */
 (function () {
