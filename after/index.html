@@ -389,6 +389,12 @@
   .news button { color: var(--orange-2); font-weight: 600; }
   .giant { font-family: var(--serif); font-size: 13.5vw; line-height: .9; color: #2e1529; text-align: center; margin: 70px 0 30px; padding: 0 2vw; letter-spacing: -.02em; white-space: nowrap; }
   .giant i { color: #46203f; }
+  .giant .ch { display: inline-block; will-change: transform; transform-origin: 50% 85%; }
+  .giant .sp { display: inline-block; width: .22em; }
+  .giant-wrap { position: relative; cursor: default; }
+  .giant-hint { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #6e4466; opacity: .8; transition: opacity .5s; pointer-events: none; }
+  .giant-wrap:hover .giant-hint { opacity: 0; }
+  @media (hover: none) { .giant-hint { display: none; } }
   .foot-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 13px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 24px; }
 
   .sticky-book { position: fixed; left: 14px; right: 14px; bottom: 14px; z-index: 80; display: none; transform: translateY(150%); transition: transform .6s var(--ease); }
@@ -782,7 +788,7 @@
       <div><h4>Hair notes</h4><p>Seasonal looks and the odd offer. No spam.</p><form class="news" onsubmit="event.preventDefault();this.querySelector('button').textContent='Thanks ✓'"><input type="email" placeholder="Your email" aria-label="Email"><button>Join</button></form></div>
     </div>
   </div>
-  <div class="giant">Velvet <i>studio</i></div>
+  <div class="giant-wrap" id="giantWrap"><div class="giant" id="giant" aria-label="Velvet studio">Velvet <i>studio</i></div><span class="giant-hint">✦ Hover me</span></div>
   <div class="wrap">
     <div class="foot-bottom"><span>© 2026 Velvet Hair Studio</span><span>14 Linden Row, Bristol</span></div>
   </div>
@@ -1290,6 +1296,65 @@ document.addEventListener('click', e => {
   }
 });
 addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+/* ---------- Footer "Velvet studio": letters spread on hover and follow the cursor ---------- */
+(function () {
+  const giant = document.getElementById('giant'), wrap = document.getElementById('giantWrap');
+  // split into one span per letter, keeping the italic part italic
+  const letters = [];
+  const split = (text, parent) => [...text].forEach(c => {
+    const sp = document.createElement('span');
+    if (c === ' ') { sp.className = 'sp'; } else { sp.className = 'ch'; sp.textContent = c; letters.push(sp); }
+    sp.setAttribute('aria-hidden', 'true'); parent.appendChild(sp);
+  });
+  [...giant.childNodes].forEach(n => {
+    if (n.nodeType === 3) { const f = document.createDocumentFragment(); split(n.textContent, f); n.replaceWith(f); }
+    else { const t = n.textContent; n.textContent = ''; split(t, n); }
+  });
+  if (!hasGsap) return;
+
+  const mid = (letters.length - 1) / 2;
+  const base = letters.map(l => getComputedStyle(l).color);
+  const hot = letters.map(l => l.closest('i') ? 'rgb(255, 139, 79)' : 'rgb(255, 199, 214)');
+  const mixes = letters.map((l, i) => gsap.utils.interpolate(base[i], hot[i]));
+  const qx = letters.map(l => gsap.quickTo(l, 'x', { duration: .9, ease: 'expo.out' }));
+  const qy = letters.map(l => gsap.quickTo(l, 'y', { duration: .7, ease: 'expo.out' }));
+  const qs = letters.map(l => gsap.quickTo(l, 'scale', { duration: .7, ease: 'expo.out' }));
+  const qr = letters.map(l => gsap.quickTo(l, 'rotation', { duration: .9, ease: 'expo.out' }));
+
+  let pending = [];
+  function update(mx) {
+    pending.forEach(c => c.kill()); pending = [];
+    gsap.killTweensOf(letters, 'color');
+    const r = giant.getBoundingClientRect(), fs = parseFloat(getComputedStyle(giant).fontSize);
+    const spread = innerWidth * .014, reach = innerWidth * .2;
+    letters.forEach((l, i) => {
+      // offsetLeft ignores transforms, so the spread doesn't feed back into the distance
+      const cx = r.left + l.offsetLeft + l.offsetWidth / 2, d = mx - cx;
+      const near = Math.max(0, 1 - Math.abs(d) / reach), ease = near * near * (3 - 2 * near);
+      qx[i]((i - mid) * spread); qy[i](-ease * fs * .14); qs[i](1 + ease * .14); qr[i](-d / reach * 6 * ease);
+      l.style.color = mixes[i](ease);
+    });
+  }
+  // settle back from the centre outwards, through the same quickTo movers
+  function reset() {
+    letters.forEach((l, i) => pending.push(gsap.delayedCall(Math.abs(i - mid) * .03, () => {
+      qx[i](0); qy[i](0); qs[i](1); qr[i](0);
+      gsap.to(l, { color: base[i], duration: .9, ease: 'expo.out' });
+    })));
+  }
+
+  if (matchMedia('(hover: hover)').matches) {
+    wrap.addEventListener('mousemove', e => update(e.clientX));
+    wrap.addEventListener('mouseleave', reset);
+  } else {
+    // touch screens: play the wave once when the footer comes into view
+    ScrollTrigger.create({ trigger: giant, start: 'top 85%', once: true, onEnter: () => {
+      const r = giant.getBoundingClientRect(), o = { x: r.left };
+      gsap.to(o, { x: r.right, duration: 1.8, ease: 'power1.inOut', onUpdate: () => update(o.x), onComplete: reset });
+    } });
+  }
+})();
 
 /* ---------- Gallery lightbox ----------
    Opens by growing the clicked tile into a centred frame, slides between
