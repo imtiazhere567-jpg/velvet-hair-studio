@@ -395,6 +395,39 @@
   .sticky-book.show { transform: none; }
   .sticky-book .btn-book { width: 100%; justify-content: center; }
 
+  /* ---------- Gallery lightbox ---------- */
+  .lb { position: fixed; inset: 0; z-index: 300; pointer-events: none; visibility: hidden; }
+  .lb.open { pointer-events: auto; visibility: visible; }
+  .lb-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(61,20,54,.86), rgba(20,7,18,.96)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; }
+  .lb-frame { position: fixed; overflow: hidden; border-radius: 22px; background: #2a1026; box-shadow: 0 50px 120px -30px rgba(0,0,0,.7); touch-action: pan-y; cursor: grab; }
+  .lb-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+  .lb-ui { position: absolute; opacity: 0; color: #fff; }
+  .lb-top { top: 26px; left: 32px; right: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .lb-count { font-family: var(--serif); font-size: 22px; letter-spacing: .02em; }
+  .lb-count span { color: rgba(255,255,255,.5); }
+  .lb-count small { font-family: var(--sans); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #ffc7d6; margin-left: 14px; }
+  .lb-btn { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); backdrop-filter: blur(10px); transition: background .4s, transform .6s var(--ease), border-color .4s; }
+  .lb-btn:hover { background: var(--orange); border-color: var(--orange); }
+  .lb-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .lb-close:hover { transform: rotate(90deg); }
+  .lb-prev, .lb-next { top: 50%; margin-top: -27px; }
+  .lb-prev { left: 32px; } .lb-next { right: 32px; }
+  .lb-prev:hover { transform: translateX(-4px); } .lb-next:hover { transform: translateX(4px); }
+  .lb-bottom { left: 32px; right: 32px; bottom: 28px; display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+  .lb-title { overflow: hidden; }
+  .lb-title h3 { color: #fff; font-size: clamp(34px, 3.6vw, 54px); line-height: 1; }
+  .lb-title p { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #ffc7d6; margin-top: 10px; }
+  .lb-dots { position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%); display: flex; gap: 6px; opacity: 0; }
+  .lb-dots i { width: 6px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.3); transition: width .5s var(--ease), background .3s; }
+  .lb-dots i.on { width: 26px; background: var(--orange); }
+  @media (max-width: 760px) {
+    .lb-top { top: 18px; left: 18px; right: 18px; } .lb-count small { display: none; }
+    .lb-prev, .lb-next { top: auto; bottom: 108px; margin-top: 0; width: 46px; height: 46px; }
+    .lb-prev { left: 18px; } .lb-next { right: 18px; }
+    .lb-bottom { left: 18px; right: 18px; bottom: 18px; flex-direction: column; align-items: flex-start; gap: 14px; }
+    .lb-dots { display: none; }
+  }
+
   /* ---------- Booking drawer ---------- */
   .modal { position: fixed; inset: 0; z-index: 400; display: flex; justify-content: flex-end; pointer-events: none; }
   .modal .shade { position: absolute; inset: 0; background: rgba(31,12,28,.5); backdrop-filter: blur(6px); opacity: 0; transition: opacity .6s; }
@@ -745,7 +778,7 @@
     <div class="foot-grid">
       <div><a href="#top" class="logo" style="color:#fff">Velvet <i style="color:#f2b6c9">Hair Studio</i></a><p style="max-width:300px;margin-top:18px">Cuts, colour and balayage in the heart of Bristol. Hair that feels like you.</p></div>
       <div><h4>Studio</h4><a href="#about">About</a><a href="#team">Team</a><a href="#gallery">Gallery</a><a href="#visit">Visit</a></div>
-      <div><h4>Follow</h4><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">Pinterest</a><a href="#">Facebook</a></div>
+      <div><h4>Follow</h4><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/" target="_blank" rel="noopener">Pinterest</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a></div>
       <div><h4>Hair notes</h4><p>Seasonal looks and the odd offer. No spam.</p><form class="news" onsubmit="event.preventDefault();this.querySelector('button').textContent='Thanks ✓'"><input type="email" placeholder="Your email" aria-label="Email"><button>Join</button></form></div>
     </div>
   </div>
@@ -756,6 +789,23 @@
 </footer>
 
 <div class="sticky-book" id="stickyBook"><button class="btn-book" data-book>Book now <span class="arr"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
+
+<!-- Gallery lightbox -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Gallery viewer" aria-hidden="true">
+  <div class="lb-shade" data-lb-close></div>
+  <div class="lb-frame" id="lbFrame"><img id="lbImg" alt=""></div>
+  <div class="lb-ui lb-top">
+    <div class="lb-count" id="lbCount">01 <span>/ 12</span><small>Made at Velvet</small></div>
+    <button class="lb-btn lb-close" data-lb-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <button class="lb-ui lb-btn lb-prev" id="lbPrev" aria-label="Previous photo"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="lb-ui lb-btn lb-next" id="lbNext" aria-label="Next photo"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <div class="lb-dots" id="lbDots"></div>
+  <div class="lb-ui lb-bottom">
+    <div class="lb-title"><h3 id="lbTitle">Look</h3><p id="lbSub">Balayage</p></div>
+    <button class="btn-book" id="lbBook">Book this look <span class="arr"></span></button>
+  </div>
+</div>
 
 <!-- Booking drawer -->
 <div class="modal" id="modal" aria-hidden="true">
@@ -805,7 +855,7 @@ const IMG = {
   modal:   '1633681926022-84c23e8cb2d6',
   services: ['1562322140-8baeececf3df', '1580618672591-eb180b1a973f', '1634449571010-02389ed0f9b0', '1527799820374-dcf8d9d4a388', '1516975080664-ed2fc6a32937', '1519699047748-de8e457a634e'],
   exp:     ['1522337360788-8b13dee7a37e', '1559599101-f09722fb4948', '1595476108010-b4d1f102b1b1', '1487412947147-5cebf100ffc2'],
-  gallery: ['1470259078422-826894b933aa', '1506863530036-1efeddceb993', '1457972729786-0411a3b2b626', '1492106087820-71f1a00d2b11', '1524504388940-b1c1722653e1', '1626954079979-ec4f7b05e032', '1519699047748-de8e457a634e', '1487412947147-5cebf100ffc2', '1634449571010-02389ed0f9b0', '1580618672591-eb180b1a973f', '1595475884562-073c30d45670', '1522337360788-8b13dee7a37e'],
+  gallery: ['1470259078422-826894b933aa', '1506863530036-1efeddceb993', '1562259920-47afc3030ba2', '1492106087820-71f1a00d2b11', '1524504388940-b1c1722653e1', '1626954079979-ec4f7b05e032', '1519699047748-de8e457a634e', '1779398342358-94535ad182dd', '1634449571010-02389ed0f9b0', '1580618672591-eb180b1a973f', '1619718908820-5c1de14e0b7e', '1522337360788-8b13dee7a37e'],
   // team photos live in the team list below (Pexels)
   avatars: ['1531123897727-8f129e1688ce', '1580489944761-15a19d654956', '1524504388940-b1c1722653e1', '1506863530036-1efeddceb993', '1492106087820-71f1a00d2b11', '1457972729786-0411a3b2b626']
 };
@@ -860,11 +910,18 @@ expMedia.insertAdjacentHTML('afterbegin', IMG.exp.map((id, i) => `<img src="${sr
 const expLabels = ['01 · Consultation', '02 · Wash & care', '03 · Cut & colour', '04 · The finish'];
 
 /* ---------- Gallery ---------- */
-const capTxt = ['Honey balayage', 'Soft blonde', 'Copper gloss', 'Caramel melt', 'Lived in brunette', 'Golden ends', 'Glossy waves', 'Natural curls', 'Bronde ribbons', 'Fresh cut', 'Colour refresh', 'Event styling'];
+// [title, service] for each gallery photo, in the same order as IMG.gallery
+const looks = [
+  ['Rose pink colour', 'Creative colour'], ['Textured pixie', 'Precision cut'], ['Fresh blow dry', 'Blow dry bar'],
+  ['Lilac waves', 'Pastel colour'], ['Soft bronde', 'Balayage'], ['Braided updo', 'Occasion styling'],
+  ['Natural curls', 'Curl cut & care'], ['Bouncy blonde curls', 'Blow dry bar'], ['Wash & scalp ritual', 'Treatment'],
+  ['Salon finish', 'Cut & blow dry'], ['Defined brunette curls', 'Curl cut & care'], ['Honey balayage', 'Balayage']
+];
+const capTxt = looks.map(l => l[0]);
 const cols = ['', '', '', ''];
 IMG.gallery.forEach((id, i) => {
   const c = i % 4, size = (i + c) % 2 ? 's' : 't';
-  cols[c] += `<div class="gi ${size} ph" data-cursor="View">${img(id, 700, capTxt[i])}<span class="cap">${capTxt[i]}</span></div>`;
+  cols[c] += `<div class="gi ${size} ph" data-cursor="View" data-i="${i}" role="button" tabindex="0" aria-label="View ${capTxt[i]}">${img(id, 700, capTxt[i])}<span class="cap">${capTxt[i]}</span></div>`;
 });
 document.getElementById('galCols').innerHTML = cols.map(c => `<div class="gal-col">${c}${c}</div>`).join('');
 
@@ -906,7 +963,7 @@ teamStrip.innerHTML = team.map((m, i) => `
     <img src="${pexels(m.photo, 1200)}" alt="${m.name}, ${m.role}" loading="lazy" style="object-position:${m.pos}" onerror="this.style.opacity=0">
     <span class="no">0${i + 1}</span>
     <span class="bar"><i></i></span>
-    <a class="ig" href="#">${m.ig}</a>
+    <a class="ig" href="https://www.instagram.com/" target="_blank" rel="noopener">${m.ig}</a>
     <span class="vname">${m.name}<small>${m.role.split(' · ')[1]}</small></span>
     <div class="info">
       <span class="role">${m.role}</span>
@@ -1233,6 +1290,114 @@ document.addEventListener('click', e => {
   }
 });
 addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+/* ---------- Gallery lightbox ----------
+   Opens by growing the clicked tile into a centred frame, slides between
+   photos, and shrinks back into the matching tile on close. */
+(function () {
+  const lb = document.getElementById('lb'), frame = document.getElementById('lbFrame'), lbImg = document.getElementById('lbImg');
+  const shade = lb.querySelector('.lb-shade'), ui = lb.querySelectorAll('.lb-ui'), dotsEl = document.getElementById('lbDots');
+  const titleEl = document.getElementById('lbTitle'), subEl = document.getElementById('lbSub'), countEl = document.getElementById('lbCount');
+  const total = IMG.gallery.length, pad2 = n => String(n).padStart(2, '0');
+  const ease = 'expo.inOut';
+  let idx = 0, isOpen = false, busy = false, hidden = null;
+  dotsEl.innerHTML = IMG.gallery.map(() => '<i></i>').join('');
+  if (!hasGsap) return;
+
+  // aspect ratio of photo i, read from its loaded gallery thumbnail (fallback 4:5)
+  const aspect = i => { const t = document.querySelector(`.gi[data-i="${i}"] img`); return t && t.naturalWidth ? t.naturalWidth / t.naturalHeight : .8; };
+  const fit = ar => {
+    const m = innerWidth <= 760, top = m ? 80 : 100, bottom = m ? 170 : 130, side = m ? 16 : 120;
+    const maxW = Math.min(innerWidth - side * 2, 1280), maxH = innerHeight - top - bottom;
+    let w = maxW, h = w / ar; if (h > maxH) { h = maxH; w = h * ar; }
+    return { left: (innerWidth - w) / 2, top: top + (maxH - h) / 2, width: w, height: h };
+  };
+  // the on-screen tile for photo i (each photo appears twice in the looping columns)
+  const tileFor = i => [...document.querySelectorAll(`.gi[data-i="${i}"]`)].find(t => {
+    const r = t.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && r.width > 0;
+  });
+  const rectOf = el => { const r = el.getBoundingClientRect(); return { left: r.left, top: r.top, width: r.width, height: r.height }; };
+  const show = el => { if (hidden) hidden.style.visibility = ''; hidden = el; if (el) el.style.visibility = 'hidden'; };
+  const loadBig = i => { const big = new Image(); big.onload = () => { if (idx === i && isOpen) lbImg.src = big.src; }; big.src = src(IMG.gallery[i], 1800); };
+  const setText = i => {
+    titleEl.textContent = looks[i][0]; subEl.textContent = looks[i][1];
+    countEl.innerHTML = `${pad2(i + 1)} <span>/ ${pad2(total)}</span><small>Made at Velvet</small>`;
+    dotsEl.querySelectorAll('i').forEach((d, j) => d.classList.toggle('on', j === i));
+  };
+
+  function open(tile) {
+    if (isOpen || busy) return;
+    busy = true; isOpen = true; idx = +tile.dataset.i;
+    const thumb = tile.querySelector('img');
+    lbImg.src = thumb.currentSrc || thumb.src; loadBig(idx); setText(idx);
+    lb.classList.add('open'); lb.setAttribute('aria-hidden', 'false');
+    lenis && lenis.stop(); document.body.style.overflow = 'hidden';
+    show(tile);
+    gsap.set(frame, { ...rectOf(tile), borderRadius: 22, opacity: 1 });
+    gsap.timeline({ onComplete: () => { busy = false; show(null); } })
+      .to(shade, { opacity: 1, duration: .6, ease: 'power2.out' }, 0)
+      .to(frame, { ...fit(aspect(idx)), borderRadius: 18, duration: 1, ease }, 0)
+      .fromTo(lbImg, { scale: 1.25 }, { scale: 1, duration: 1.2, ease }, 0)
+      .fromTo(ui, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .7, stagger: .06, ease: 'expo.out' }, .55)
+      .fromTo(dotsEl, { opacity: 0 }, { opacity: 1, duration: .5 }, .7)
+      .from('#lbTitle', { yPercent: 110, duration: .9, ease: 'expo.out' }, .6);
+  }
+
+  function go(dir) {
+    if (!isOpen || busy) return;
+    busy = true;
+    const next = (idx + dir + total) % total;
+    gsap.timeline({ onComplete: () => busy = false })
+      .to(lbImg, { xPercent: -dir * 18, opacity: 0, scale: .96, duration: .35, ease: 'power2.in' })
+      .to('#lbTitle', { yPercent: -110, duration: .3, ease: 'power2.in' }, 0)
+      .add(() => {
+        idx = next; const t = document.querySelector(`.gi[data-i="${idx}"] img`);
+        lbImg.src = t ? (t.currentSrc || t.src) : src(IMG.gallery[idx], 900); loadBig(idx); setText(idx);
+      })
+      .to(frame, { ...fit(aspect(next)), duration: .6, ease })
+      .fromTo(lbImg, { xPercent: dir * 18, opacity: 0, scale: 1.04 }, { xPercent: 0, opacity: 1, scale: 1, duration: .6, ease: 'expo.out' }, '-=.35')
+      .fromTo('#lbTitle', { yPercent: 110 }, { yPercent: 0, duration: .7, ease: 'expo.out' }, '-=.5');
+  }
+
+  function close(after) {
+    if (!isOpen || busy) return;
+    busy = true;
+    const tile = tileFor(idx);
+    const done = () => {
+      lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); show(null);
+      gsap.set([frame, lbImg], { clearProps: 'all' }); lbImg.removeAttribute('src');
+      lenis && lenis.start(); document.body.style.overflow = '';
+      isOpen = false; busy = false; after && after();
+    };
+    const tl = gsap.timeline({ onComplete: done })
+      .to([...ui, dotsEl], { opacity: 0, y: 12, duration: .3, ease: 'power2.in' }, 0)
+      .to(shade, { opacity: 0, duration: .7, ease: 'power2.inOut' }, .2);
+    if (tile) {
+      show(tile);
+      tl.to(frame, { ...rectOf(tile), borderRadius: 22, duration: .85, ease }, 0)
+        .to(lbImg, { scale: 1.15, duration: .85, ease }, 0);
+    } else {
+      tl.to(frame, { scale: .85, opacity: 0, duration: .5, ease: 'power2.in' }, 0);
+    }
+  }
+
+  // open from any tile (click or keyboard)
+  document.getElementById('galCols').addEventListener('click', e => { const t = e.target.closest('.gi'); if (t) open(t); });
+  document.getElementById('galCols').addEventListener('keydown', e => { const t = e.target.closest('.gi'); if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(t); } });
+  document.getElementById('lbPrev').addEventListener('click', () => go(-1));
+  document.getElementById('lbNext').addEventListener('click', () => go(1));
+  lb.addEventListener('click', e => { if (e.target.closest('[data-lb-close]')) close(); });
+  document.getElementById('lbBook').addEventListener('click', () => close(openModal));
+  addEventListener('keydown', e => {
+    if (!isOpen) return;
+    if (e.key === 'Escape') close(); else if (e.key === 'ArrowRight') go(1); else if (e.key === 'ArrowLeft') go(-1);
+  });
+  // swipe / drag on the photo
+  let sx = null;
+  frame.addEventListener('pointerdown', e => { sx = e.clientX; });
+  addEventListener('pointerup', e => { if (sx === null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1); });
+  addEventListener('resize', () => { if (isOpen && !busy) gsap.set(frame, fit(aspect(idx))); });
+})();
 </script>
 </body>
 </html>
